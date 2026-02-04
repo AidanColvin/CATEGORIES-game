@@ -8,29 +8,75 @@
         :root {
             --yellow: #f9df6d; --green: #a0c35a;
             --blue: #b0c4ef; --purple: #ba81c5;
-            --bg: #ffffff; --text: #000000;
+            --bg: #ffffff;
+            --default-card: #efefe6;
+            --selected-brown: #5a594e; /* The dark brown from your screenshot */
         }
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: var(--bg); padding: 20px; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; background: var(--bg); padding: 20px; }
         #game-container { max-width: 500px; width: 100%; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .word-card { 
-            aspect-ratio: 1/1; background: #efefe6; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
-            cursor: pointer; user-select: none; text-align: center; padding: 5px;
-        }
-        .word-card.selected { background: #5a594e; color: white; }
-        .solved-row { 
-            grid-column: span 4; height: 60px; border-radius: 6px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-bottom: 10px; font-weight: bold;
-        }
-        .stats { margin-bottom: 20px; font-size: 1.1rem; }
-        .controls { display: flex; gap: 10px; justify-content: center; }
-        button { padding: 10px 20px; border-radius: 20px; border: 1px solid #000; background: white; cursor: pointer; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* UX Animations */
+        /* Grid styling with black gaps */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 8px; /* The "lines" between the boxes */
+            padding: 8px;
+            background-color: #000000; /* This makes the gaps appear black */
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .word-card { 
+            aspect-ratio: 1/1; 
+            background: var(--default-card); 
+            border-radius: 4px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: 700; 
+            text-transform: uppercase; 
+            /* Larger text as requested */
+            font-size: 1rem; 
+            cursor: pointer; 
+            user-select: none; 
+            text-align: center; 
+            padding: 10px;
+            color: #000;
+        }
+
+        /* Selected state - The Dark Brown color */
+        .word-card.selected { 
+            background: var(--selected-brown); 
+            color: white; 
+        }
+
+        .solved-row { 
+            grid-column: span 4; 
+            height: 70px; 
+            border-radius: 6px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            margin-bottom: 8px; 
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .stats { margin-bottom: 20px; font-size: 1.2rem; font-weight: 500; }
+        .controls { display: flex; gap: 15px; justify-content: center; margin-top: 10px; }
+        
+        button { 
+            padding: 15px 25px; 
+            border-radius: 30px; 
+            border: 1px solid #000; 
+            background: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 1rem;
+        }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         .shake { animation: shake 0.2s ease-in-out 0s 2; }
     </style>
@@ -48,19 +94,18 @@
     </div>
 
     <script>
-        let gameData = {};
+        let gameData = [];
         let selectedWords = [];
         let mistakes = 4;
         let solvedCategories = [];
 
-        // Load your validated JSON
         async function initGame() {
             try {
                 const response = await fetch('categories.json');
                 const data = await response.json();
-                // Get the first batch for testing
-                const batch = data.batches[Object.keys(data.batches)[0]];
-                gameData = batch;
+                // Selecting the first batch
+                const batchKey = Object.keys(data.batches)[0];
+                gameData = data.batches[batchKey];
                 renderGrid();
             } catch (e) { console.error("Could not load categories.json", e); }
         }
@@ -69,11 +114,14 @@
             const gridEl = document.getElementById('grid');
             gridEl.innerHTML = '';
             
-            // Get all words from categories not yet solved
             const words = gameData
                 .filter(cat => !solvedCategories.includes(cat.id))
                 .flatMap(cat => cat.words.map(w => ({ text: w, catId: cat.id })))
                 .sort(() => Math.random() - 0.5);
+
+            // If no words left, hide the black grid container
+            if (words.length === 0) gridEl.style.display = 'none';
+            else gridEl.style.display = 'grid';
 
             words.forEach(wordObj => {
                 const div = document.createElement('div');
@@ -113,12 +161,14 @@
             const row = document.createElement('div');
             row.className = 'solved-row';
             row.style.backgroundColor = `var(--${category.color.toLowerCase()})`;
-            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal">${category.words.join(', ')}</div>`;
+            row.innerHTML = `<div style="font-size: 1.1rem">${category.name}</div><div style="font-weight:normal; font-size: 0.9rem">${category.words.join(', ')}</div>`;
             
             document.getElementById('solved-container').appendChild(row);
             selectedWords = [];
             renderGrid();
-            if (solvedCategories.length === 4) alert("You won!");
+            if (solvedCategories.length === 4) {
+                setTimeout(() => alert("Excellent!"), 300);
+            }
         }
 
         function handleWrong() {
