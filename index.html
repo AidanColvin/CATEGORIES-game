@@ -10,64 +10,84 @@
             --blue: #b0c4ef; --purple: #ba81c5;
             /* Page Background: Floral White */
             --bg: #FFFAF0; 
-            /* Card Background: Bone */
-            --card-default: #E3DAC9; 
-            /* Selected Background: Classic Taupe */
-            --card-selected: #D3BBA4; 
+            /* Card Base: Ivory Brown */
+            --card-base: #B09B8C; 
+            /* Card Selected: Bisque */
+            --card-selected: #FFE4C4; 
+            --grid-line: #000;
         }
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif; 
             display: flex; flex-direction: column; align-items: center; 
-            background: var(--bg); padding: 20px; 
+            background: var(--bg); padding: 40px 20px; 
         }
-        #game-container { max-width: 500px; width: 100%; }
         
-        /* Uniform black grid */
+        /* Scaled up container for better visibility */
+        #game-container { max-width: 700px; width: 100%; }
+        
+        h1 { margin-bottom: 30px; font-size: 2.5rem; }
+
+        /* Grid with uniform line width */
         .grid { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 6px; 
-            padding: 6px; 
-            background-color: #000; 
-            border: 6px solid #000; 
-            border-radius: 12px;
-            margin-bottom: 20px;
+            gap: 12px; 
+            padding: 12px; 
+            background-color: var(--grid-line); 
+            border: 12px solid var(--grid-line); 
+            border-radius: 16px;
+            margin-bottom: 30px;
         }
 
         .word-card { 
-            aspect-ratio: 1/1; background: var(--card-default); 
-            border-radius: 8px; /* Slightly more curved corners */
+            aspect-ratio: 1/1; 
+            background: var(--card-base); 
+            border-radius: 12px; 
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             font-weight: 800; text-transform: uppercase; 
-            cursor: pointer; user-select: none; text-align: center; padding: 5px;
-            transition: background 0.2s;
+            cursor: pointer; user-select: none; text-align: center; 
+            padding: 15px;
+            transition: all 0.2s ease;
         }
-        .word-text { font-size: 1rem; color: #000; }
         
-        /* Definitions styling */
+        .word-text { font-size: 1.3rem; color: #000; }
+        
+        /* Definitions styling - larger for the bigger boxes */
         .def-container { 
-            font-size: 0.55rem; text-transform: none; font-weight: 500; 
-            margin-top: 4px; color: #333; line-height: 1.1;
-            display: none; /* Hidden by default */
+            font-size: 0.75rem; text-transform: none; font-weight: 500; 
+            margin-top: 8px; color: #222; line-height: 1.2;
+            display: none; 
         }
 
-        /* Selected state: Classic Taupe */
+        /* Selection Color: Bisque */
         .word-card.selected { background: var(--card-selected); }
 
         .solved-row { 
-            grid-column: span 4; height: 70px; border-radius: 10px;
+            grid-column: span 4; height: 90px; border-radius: 12px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-bottom: 8px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 12px; font-weight: 800; text-transform: uppercase;
+            font-size: 1.2rem;
         }
 
-        .stats { margin-bottom: 20px; font-size: 1.2rem; font-weight: 600; }
-        .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        /* Controls and Attempts */
+        .controls { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; }
         
-        button { 
-            padding: 12px 20px; border-radius: 40px; border: 1.5px solid #000; 
-            background: white; font-weight: bold; cursor: pointer; font-size: 0.9rem;
+        .attempts-section { 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-weight: 400; font-size: 1.1rem; /* Not bold as requested */
         }
-        button:disabled { opacity: 0.3; cursor: not-allowed; border-color: #999; }
+        .circles-container { display: flex; gap: 8px; }
+        .circle { 
+            width: 14px; height: 14px; background: #5a594e; border-radius: 50%; 
+            transition: opacity 0.3s;
+        }
+        .circle.spent { opacity: 0.1; }
+
+        button { 
+            padding: 15px 25px; border-radius: 40px; border: 2px solid #000; 
+            background: white; font-weight: bold; cursor: pointer; font-size: 1rem;
+        }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
         
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         .shake { animation: shake 0.2s ease-in-out 0s 2; }
@@ -76,19 +96,30 @@
 <body>
 
     <h1>Categories</h1>
+    
     <div id="game-container">
-        <div class="stats">Mistakes remaining: <span id="mistakes">4</span></div>
         <div id="solved-container"></div>
         <div id="grid" class="grid"></div>
+        
         <div class="controls">
             <button id="shuffle-btn">Shuffle</button>
             <button id="def-btn">Definitions</button>
             <button id="submit-btn" disabled>Submit</button>
         </div>
+
+        <div class="attempts-section">
+            <span>Attempts:</span>
+            <div id="circles" class="circles-container">
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Dictionary with real definitions
+        // Dictionary for definitions
         const dictionary = {
             "BARK": { phon: "/bɑːrk/", def: "The protective outer covering of a tree trunk." },
             "LEAF": { phon: "/liːf/", def: "A flattened structure of a higher plant, typically green." },
@@ -120,7 +151,6 @@
                 const data = await response.json();
                 const batchKey = Object.keys(data.batches)[0];
                 gameData = data.batches[batchKey];
-                
                 currentWords = gameData.flatMap(cat => cat.words.map(w => ({ text: w, catId: cat.id })));
                 shuffleWords();
             } catch (e) { console.error("Error loading JSON", e); }
@@ -129,29 +159,20 @@
         function renderGrid() {
             const gridEl = document.getElementById('grid');
             gridEl.innerHTML = '';
-            
-            if (currentWords.length === 0) {
-                gridEl.style.display = 'none';
-                return;
-            }
+            if (currentWords.length === 0) { gridEl.style.display = 'none'; return; }
 
             currentWords.forEach(wordObj => {
                 const div = document.createElement('div');
                 div.className = 'word-card';
-                div.id = `card-${wordObj.text}`;
+                if (selectedWords.find(sw => sw.text === wordObj.text)) div.classList.add('selected');
                 
-                const isSelected = selectedWords.find(sw => sw.text === wordObj.text);
-                if (isSelected) div.classList.add('selected');
-                
-                const info = dictionary[wordObj.text] || { phon: "", def: "No definition found." };
-                
+                const info = dictionary[wordObj.text] || { phon: "", def: "Definition loading..." };
                 div.innerHTML = `
                     <div class="word-text">${wordObj.text}</div>
                     <div class="def-container" id="def-${wordObj.text}">
-                        <i>${info.phon}</i><br>${info.def}
+                        <b>${info.phon}</b><br>${info.def}
                     </div>
                 `;
-                
                 div.onclick = () => toggleSelect(div, wordObj);
                 gridEl.appendChild(div);
             });
@@ -159,11 +180,10 @@
 
         function toggleSelect(el, wordObj) {
             const defDiv = document.getElementById(`def-${wordObj.text}`);
-            
             if (el.classList.contains('selected')) {
                 el.classList.remove('selected');
                 selectedWords = selectedWords.filter(w => w.text !== wordObj.text);
-                defDiv.style.display = 'none'; // Hide definition if unselected
+                if(defDiv) defDiv.style.display = 'none';
             } else if (selectedWords.length < 4) {
                 el.classList.add('selected');
                 selectedWords.push(wordObj);
@@ -179,7 +199,6 @@
         document.getElementById('shuffle-btn').onclick = shuffleWords;
 
         document.getElementById('def-btn').onclick = () => {
-            // Only show definitions for currently selected words
             selectedWords.forEach(w => {
                 const defDiv = document.getElementById(`def-${w.text}`);
                 if (defDiv) {
@@ -204,7 +223,7 @@
             const row = document.createElement('div');
             row.className = 'solved-row';
             row.style.backgroundColor = `var(--${category.color.toLowerCase()})`;
-            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal; font-size: 0.8rem">${category.words.join(', ')}</div>`;
+            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal; font-size: 1rem">${category.words.join(', ')}</div>`;
             
             document.getElementById('solved-container').appendChild(row);
             selectedWords = [];
@@ -214,11 +233,19 @@
 
         function handleWrong() {
             mistakes--;
-            document.getElementById('mistakes').textContent = mistakes;
+            const circles = document.querySelectorAll('.circle');
+            if (circles[3 - mistakes]) {
+                circles[3 - mistakes].classList.add('spent');
+            }
+
             const grid = document.getElementById('grid');
             grid.classList.add('shake');
             setTimeout(() => grid.classList.remove('shake'), 500);
-            if (mistakes === 0) { alert("Game Over!"); location.reload(); }
+            
+            if (mistakes === 0) {
+                alert("Game Over!");
+                location.reload();
+            }
         }
 
         initGame();
