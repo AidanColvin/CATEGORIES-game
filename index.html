@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connections Game</title>
+    <style>
+        :root {
+            --yellow: #f9df6d; --green: #a0c35a;
+            --blue: #b0c4ef; --purple: #ba81c5;
+            --bg: #ffffff; --text: #000000;
+        }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: var(--bg); padding: 20px; }
+        #game-container { max-width: 500px; width: 100%; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .word-card { 
+            aspect-ratio: 1/1; background: #efefe6; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
+            cursor: pointer; user-select: none; text-align: center; padding: 5px;
+        }
+        .word-card.selected { background: #5a594e; color: white; }
+        .solved-row { 
+            grid-column: span 4; height: 60px; border-radius: 6px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin-bottom: 10px; font-weight: bold;
+        }
+        .stats { margin-bottom: 20px; font-size: 1.1rem; }
+        .controls { display: flex; gap: 10px; justify-content: center; }
+        button { padding: 10px 20px; border-radius: 20px; border: 1px solid #000; background: white; cursor: pointer; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* UX Animations */
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .shake { animation: shake 0.2s ease-in-out 0s 2; }
+    </style>
+</head>
+<body>
+
+    <h1>Connections</h1>
+    <div id="game-container">
+        <div class="stats">Mistakes remaining: <span id="mistakes">4</span></div>
+        <div id="solved-container"></div>
+        <div id="grid" class="grid"></div>
+        <div class="controls">
+            <button id="submit-btn" disabled>Submit</button>
+        </div>
+    </div>
+
+    <script>
+        let gameData = {};
+        let selectedWords = [];
+        let mistakes = 4;
+        let solvedCategories = [];
+
+        // Load your validated JSON
+        async function initGame() {
+            try {
+                const response = await fetch('categories.json');
+                const data = await response.json();
+                // Get the first batch for testing
+                const batch = data.batches[Object.keys(data.batches)[0]];
+                gameData = batch;
+                renderGrid();
+            } catch (e) { console.error("Could not load categories.json", e); }
+        }
+
+        function renderGrid() {
+            const gridEl = document.getElementById('grid');
+            gridEl.innerHTML = '';
+            
+            // Get all words from categories not yet solved
+            const words = gameData
+                .filter(cat => !solvedCategories.includes(cat.id))
+                .flatMap(cat => cat.words.map(w => ({ text: w, catId: cat.id })))
+                .sort(() => Math.random() - 0.5);
+
+            words.forEach(wordObj => {
+                const div = document.createElement('div');
+                div.className = 'word-card';
+                div.textContent = wordObj.text;
+                div.onclick = () => toggleSelect(div, wordObj);
+                gridEl.appendChild(div);
+            });
+        }
+
+        function toggleSelect(el, wordObj) {
+            if (el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                selectedWords = selectedWords.filter(w => w.text !== wordObj.text);
+            } else if (selectedWords.length < 4) {
+                el.classList.add('selected');
+                selectedWords.push(wordObj);
+            }
+            document.getElementById('submit-btn').disabled = selectedWords.length !== 4;
+        }
+
+        document.getElementById('submit-btn').onclick = () => {
+            const firstId = selectedWords[0].catId;
+            const isMatch = selectedWords.every(w => w.catId === firstId);
+
+            if (isMatch) {
+                handleCorrect(firstId);
+            } else {
+                handleWrong();
+            }
+        };
+
+        function handleCorrect(catId) {
+            const category = gameData.find(c => c.id === catId);
+            solvedCategories.push(catId);
+            
+            const row = document.createElement('div');
+            row.className = 'solved-row';
+            row.style.backgroundColor = `var(--${category.color.toLowerCase()})`;
+            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal">${category.words.join(', ')}</div>`;
+            
+            document.getElementById('solved-container').appendChild(row);
+            selectedWords = [];
+            renderGrid();
+            if (solvedCategories.length === 4) alert("You won!");
+        }
+
+        function handleWrong() {
+            mistakes--;
+            document.getElementById('mistakes').textContent = mistakes;
+            const grid = document.getElementById('grid');
+            grid.classList.add('shake');
+            setTimeout(() => grid.classList.remove('shake'), 500);
+
+            if (mistakes === 0) {
+                alert("Game Over!");
+                location.reload();
+            }
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
