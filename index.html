@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories</title>
+    <title>CATEGORIES</title>
     <style>
         :root {
             --yellow: #f9df6d; --green: #a0c35a;
@@ -14,6 +14,8 @@
             --card-base: #B09B8C; 
             /* Card Selected: Bisque */
             --card-selected: #FFE4C4; 
+            /* Buttons & Circles: Dutch White */
+            --accent: #EFDFBB;
             --grid-line: #000;
         }
         body { 
@@ -22,80 +24,88 @@
             background: var(--bg); padding: 40px 20px; 
         }
         
-        /* Scaled up container for better visibility */
-        #game-container { max-width: 700px; width: 100%; }
+        #game-container { max-width: 850px; width: 100%; }
         
-        h1 { margin-bottom: 30px; font-size: 2.5rem; }
+        /* All Caps, Large, Not Bold Title */
+        h1 { 
+            margin-bottom: 40px; 
+            font-size: 3.5rem; 
+            font-weight: 300; 
+            text-transform: uppercase; 
+            letter-spacing: 4px;
+        }
 
-        /* Grid with uniform line width */
+        /* Thinner black grid (half the previous weight) */
         .grid { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; 
-            padding: 12px; 
+            gap: 6px; 
+            padding: 6px; 
             background-color: var(--grid-line); 
-            border: 12px solid var(--grid-line); 
-            border-radius: 16px;
-            margin-bottom: 30px;
+            border: 6px solid var(--grid-line); 
+            border-radius: 24px; /* More curved grid */
+            margin-bottom: 40px;
         }
 
         .word-card { 
             aspect-ratio: 1/1; 
             background: var(--card-base); 
-            border-radius: 12px; 
+            border-radius: 20px; /* More curved box corners */
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             font-weight: 800; text-transform: uppercase; 
             cursor: pointer; user-select: none; text-align: center; 
-            padding: 15px;
-            transition: all 0.2s ease;
+            padding: 20px;
+            transition: background 0.2s ease;
         }
         
-        .word-text { font-size: 1.3rem; color: #000; }
+        .word-text { font-size: 1.5rem; color: #000; }
         
-        /* Definitions styling - larger for the bigger boxes */
         .def-container { 
-            font-size: 0.75rem; text-transform: none; font-weight: 500; 
-            margin-top: 8px; color: #222; line-height: 1.2;
+            font-size: 0.85rem; text-transform: none; font-weight: 500; 
+            margin-top: 10px; color: #222; line-height: 1.3;
             display: none; 
         }
 
-        /* Selection Color: Bisque */
         .word-card.selected { background: var(--card-selected); }
 
         .solved-row { 
-            grid-column: span 4; height: 90px; border-radius: 12px;
+            grid-column: span 4; height: 100px; border-radius: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             margin-bottom: 12px; font-weight: 800; text-transform: uppercase;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
         }
 
-        /* Controls and Attempts */
-        .controls { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; }
+        /* Controls Area */
+        .controls { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; }
         
-        .attempts-section { 
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-weight: 400; font-size: 1.1rem; /* Not bold as requested */
-        }
-        .circles-container { display: flex; gap: 8px; }
-        .circle { 
-            width: 14px; height: 14px; background: #5a594e; border-radius: 50%; 
-            transition: opacity 0.3s;
-        }
-        .circle.spent { opacity: 0.1; }
-
         button { 
-            padding: 15px 25px; border-radius: 40px; border: 2px solid #000; 
-            background: white; font-weight: bold; cursor: pointer; font-size: 1rem;
+            padding: 18px 35px; border-radius: 50px; border: 2px solid #000; 
+            background: var(--accent); /* Dutch White inside */
+            font-weight: bold; cursor: pointer; font-size: 1.1rem;
         }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
         
+        /* Attempts Area - Below Buttons, Not Bold */
+        .attempts-section { 
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            font-weight: 400; font-size: 1.3rem; 
+        }
+        .circles-container { display: flex; gap: 10px; }
+        .circle { 
+            width: 18px; height: 18px; 
+            background: var(--accent); /* Dutch White circles */
+            border-radius: 50%; 
+            transition: opacity 0.3s;
+        }
+        .circle.spent { opacity: 0; } /* Disappears when spent */
+
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         .shake { animation: shake 0.2s ease-in-out 0s 2; }
     </style>
 </head>
 <body>
 
-    <h1>Categories</h1>
+    <h1>CATEGORIES</h1>
     
     <div id="game-container">
         <div id="solved-container"></div>
@@ -119,24 +129,23 @@
     </div>
 
     <script>
-        // Dictionary for definitions
         const dictionary = {
-            "BARK": { phon: "/bɑːrk/", def: "The protective outer covering of a tree trunk." },
-            "LEAF": { phon: "/liːf/", def: "A flattened structure of a higher plant, typically green." },
-            "ROOT": { phon: "/ruːt/", def: "The part of a plant that attaches it to the ground." },
-            "BRANCH": { phon: "/bræntʃ/", def: "A part of a tree which grows out from the trunk." },
-            "SALES": { phon: "/seɪlz/", def: "The department responsible for selling goods." },
-            "LEGAL": { phon: "/ˈliːɡl/", def: "Related to or permitted by law." },
-            "ADMIN": { phon: "/ˈædmɪn/", def: "The management of public or business affairs." },
-            "SECTOR": { phon: "/ˈsektər/", def: "An area or portion that is distinct from others." },
-            "SOW": { phon: "/soʊ/", def: "To plant seed by scattering it on or in the earth." },
-            "SEED": { phon: "/siːd/", def: "A flowering plant's unit of reproduction." },
-            "BLOOM": { phon: "/bluːm/", def: "A flower, especially one cultivated for its beauty." },
-            "GARDEN": { phon: "/ˈɡɑːrdn/", def: "A piece of ground used for growing flowers or fruit." },
-            "WOOF": { phon: "/wʊf/", def: "The sound made by a barking dog." },
-            "HOWL": { phon: "/haʊl/", def: "A long, loud, doleful cry uttered by an animal." },
-            "GROWL": { phon: "/ɡraʊl/", def: "A low guttural sound made in the throat by an animal." },
-            "YELP": { phon: "/jelp/", def: "A short, sharp cry, especially of pain or alarm." }
+            "BARK": { phon: "bɑːrk", def: "The protective outer covering of a tree trunk." },
+            "LEAF": { phon: "liːf", def: "A flattened structure of a higher plant, typically green." },
+            "ROOT": { phon: "ruːt", def: "The part of a plant that attaches it to the ground." },
+            "BRANCH": { phon: "bræntʃ", def: "A part of a tree which grows out from the trunk." },
+            "SALES": { phon: "seɪlz", def: "The department responsible for selling goods." },
+            "LEGAL": { phon: "ˈliːɡl", def: "Related to or permitted by law." },
+            "ADMIN": { phon: "ˈædmɪn", def: "The management of public or business affairs." },
+            "SECTOR": { phon: "ˈsektər", def: "An area or portion that is distinct from others." },
+            "SOW": { phon: "soʊ", def: "To plant seed by scattering it on or in the earth." },
+            "SEED": { phon: "siːd", def: "A flowering plant's unit of reproduction." },
+            "BLOOM": { phon: "bluːm", def: "A flower, especially one cultivated for its beauty." },
+            "GARDEN": { phon: "ˈɡɑːrdn", def: "A piece of ground used for growing flowers or fruit." },
+            "WOOF": { phon: "wʊf", def: "The sound made by a barking dog." },
+            "HOWL": { phon: "haʊl", def: "A long, loud, doleful cry uttered by an animal." },
+            "GROWL": { phon: "ɡraʊl", def: "A low guttural sound made in the throat by an animal." },
+            "YELP": { phon: "jelp", def: "A short, sharp cry, especially of pain or alarm." }
         };
 
         let gameData = [];
@@ -223,7 +232,7 @@
             const row = document.createElement('div');
             row.className = 'solved-row';
             row.style.backgroundColor = `var(--${category.color.toLowerCase()})`;
-            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal; font-size: 1rem">${category.words.join(', ')}</div>`;
+            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal; font-size: 1.1rem">${category.words.join(', ')}</div>`;
             
             document.getElementById('solved-container').appendChild(row);
             selectedWords = [];
@@ -234,8 +243,9 @@
         function handleWrong() {
             mistakes--;
             const circles = document.querySelectorAll('.circle');
-            if (circles[3 - mistakes]) {
-                circles[3 - mistakes].classList.add('spent');
+            // Remove circle from right to left
+            if (circles[mistakes]) {
+                circles[mistakes].classList.add('spent');
             }
 
             const grid = document.getElementById('grid');
@@ -243,8 +253,7 @@
             setTimeout(() => grid.classList.remove('shake'), 500);
             
             if (mistakes === 0) {
-                alert("Game Over!");
-                location.reload();
+                setTimeout(() => { alert("Game Over!"); location.reload(); }, 600);
             }
         }
 
