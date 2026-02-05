@@ -1,46 +1,89 @@
-A category puzzle using overlap logic for difficulty
+# Connections: Overlap Logic Edition
 
-# Categories
+This project is a Python-based word puzzle game designed to challenge deduction through a sophisticated **Overlap Logic Engine**. Unlike standard trivia, these puzzles are built on "Chains of Interference," where words logically belong to multiple categories simultaneously.
 
-# Category 1 - Seed (LIGHT SOFT GREEN)
-Definition: The most "obvious" group, but still compromised.
-The Rule: Must have a 2-word overlap.
-Effect: Even the easiest category has 50% of its words "stolen" by other more complex categories.
-COLOR_SEED = "#90EE90"    # Light Soft Green
+---
 
-# Category 2 - Red Herring (LIGHT SOFT BLUE)
-Definition: The primary distractor.
-The Rule: Must have a 3-word overlap with the Seed or Tricky groups.
-Effect: This specifically targets the "obvious" connections, making the player second-guess the simplest category.
-COLOR_RED_HERRING = "#ADD8E6"  # Light Soft Blue
+## 🧩 Difficulty Matrix & Overlap Logic
 
-# Category 3 - Tricky (LIGHT SOFT YELLOW)
-Definition: A high-interference group.
-The Rule: Must have a 3-word overlap with the rest of the board.
-Effect: This creates a "Red Herring" situation where the player sees a nearly complete set of 4, but one word is actually part of the Expert or Seed group.
-COLOR_TRICKY = "#FFFFE0"    # Light Soft Yellow
+Difficulty is determined by how many words from a category are "stolen" by other groups on the board.
 
-# Category 4 - Expert (LIGHT SOFT RED)
-Definition: This is the hardest category to solve because it doesn't exist in isolation.
-The Rule: It must have an overlap of at least 4 words across the other three categories.
-Effect: Every single word in the Expert category could "logically" fit somewhere else, forcing the player to solve the other three groups first to find what's left over.
-COLOR_Expert = "#FFB6C1"  # Light Soft Red
+| Difficulty | Category Type | Color | Logic Rule | Effect on Player |
+| --- | --- | --- | --- | --- |
+| **Level 1** | **Seed** | `#90EE90` | 2-word overlap | The "anchor" group. 50% of its words are shared with more complex categories. |
+| **Level 2** | **Red Herring** | `#ADD8E6` | 3-word overlap | The primary distractor. Targets the Seed/Tricky groups to create false sets. |
+| **Level 3** | **Tricky** | `#FFFFE0` | 3-word overlap | High-interference. Creates a "nearly complete" set of 4 that is actually invalid. |
+| **Level 4** | **Expert** | `#FFB6C1` | 4-word overlap | The hardest group. It does not exist in isolation; all 4 words fit elsewhere. |
 
-# Categories Rules
-There are four categories, each category has a different level of difficulty (hard, tricky, red herring, seed) 
-Categories should be related to the words in other categories (e.g. if the category is "animals", the other categories could be "colors", "fruits", "countries", etc.) 
-Categories should not be related to spelling or grammar (e.g. "verbs", "nouns", "adjectives", etc.) 
-Categories should not be related to root of words or adding a letter to the end or beginning of a word (e.g. "cat", "cats", "catty", etc.)
+---
 
-# Knowlage Generator
-master_category_bank.json
+## 📋 Categorization Rules
+
+To maintain the quality and logic of the game, all puzzles must adhere to the following strict guidelines:
+
+### Relationship Rules
+
+* **Thematic Consistency:** Categories must be conceptually related (e.g., "Animals," "Colors," "Fruits").
+* **Difficulty Scaling:** Every board must contain exactly four categories: Seed, Red Herring, Tricky, and Expert.
+
+### Prohibited Categories
+
+* **No Grammar/Linguistics:** Categories based on parts of speech (Nouns, Verbs, Adjectives) are strictly forbidden.
+* **No Spelling Tricks:** Categories cannot rely on spelling patterns (e.g., "Words starting with S").
+* **No Word Roots:** Categories cannot be based on word roots or simple suffixes/prefixes (e.g., "Cat," "Cats," "Catty").
+
+---
+
+## ✍️ Word Selection Criteria
+
+* **Length:** Words must be at least **3 letters** long.
+* **Complexity:** Words must not exceed **3 syllables**.
+* **Accessibility:** Use common, recognizable words. Avoid obscure, technical, or highly specialized terms.
+* **Uniqueness:** Each word is unique to the grid but serves as a "bridge" between multiple category themes.
+
+---
+
+## ⚙️ Function Flow
+
+The engine assembles the board using a specific four-step generation process:
+
+1. **Import Bank:** Loads the `master_category_bank.json`.
+2. **Select Seed:** Picks the first category to set the board's baseline theme.
+3. **Calculate Overlap:** * Finds a **Red Herring** sharing 3 words with the Seed/Tricky group.
+* Finds a **Tricky** group sharing 3 words with the total board.
 
 
-# Funtion Flow
-Import master_category_bank.json 
-Find overlap count
-Category overlap
-Select seed
-Select red hair
-Select Tricky
-Hard
+4. **Finalize Expert:** Identifies a category where all 4 words overlap across the other three themes, making it solvable only by elimination.
+
+---
+
+## 🎮 Interface & Controls
+
+* **The Grid:** A 4x4 layout of 16 boxes.
+* **Interaction:** * **Select:** Click a box to highlight it (adds to selection list).
+* **Deselect:** Click again to remove from selection.
+* **Submit:** Press the **Submit** button or the **Return** key.
+
+
+* **Feedback System:**
+* **3 Correct:** Displays "One off."
+* **2 Correct:** Displays "2 off."
+* **Otherwise:** Displays "Try again."
+
+
+* **Utility:** * **Shuffle:** Randomizes the grid without clearing selections.
+* **Reset:** Wipes progress and generates a new puzzle.
+
+
+
+---
+
+## 📂 Master Category Bank
+
+**Example Chain of Interference:**
+
+* **Seed (FRUIT):** Apple, **DATE**, **LIME**, Kiwi
+* **Red Herring (CALENDAR):** **DATE**, Month, Year, Week
+* **Tricky (COLORS):** **LIME**, Orange, Rose, **SILVER**
+* **Expert (METALS):** **SILVER**, Gold, Iron, Tin
+
