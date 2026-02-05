@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CATEGORIES: OVERLAP EDITION</title>
+    <title>CATEGORIES</title>
     <style>
         :root {
             --bg: #FFFAF0; 
@@ -36,15 +36,21 @@
             background: var(--card-base); border-radius: 25px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-weight: 800; text-transform: uppercase; cursor: pointer; 
-            user-select: none; text-align: center; padding: 5px; transition: background 0.15s ease;
+            user-select: none; text-align: center; padding: 10px; transition: background 0.15s ease;
         }
-        .word-text { font-size: 1.1rem; color: #000; }
+        .word-text { font-size: 1.2rem; color: #000; }
         
+        /* LARGER FONT FOR DEFINITIONS AND PHONETICS */
         .def-container { 
-            font-size: 0.65rem; text-transform: none; font-weight: 500; 
-            color: #222; line-height: 1.1; display: none; padding: 0 8px; margin-top: 4px;
+            font-size: 0.9rem; /* Increased from 0.65rem */
+            text-transform: none; font-weight: 500; 
+            color: #111; line-height: 1.2; display: none; padding: 5px 8px; margin-top: 6px;
+            background: rgba(255, 255, 255, 0.3); border-radius: 10px;
         }
-        .phonetic-text { font-style: italic; color: #444; display: block; margin-bottom: 2px; }
+        .phonetic-text { 
+            font-size: 1rem; /* Increased from 0.7rem */
+            font-style: italic; color: #333; display: block; margin-bottom: 3px; font-weight: bold;
+        }
 
         .word-card.selected { background: var(--card-selected); filter: brightness(1.1); }
 
@@ -57,10 +63,9 @@
             flex: 1; padding: 12px 0; border-radius: 50px; 
             border: var(--border-width) solid #000; background: transparent; 
             cursor: pointer; font-size: 0.85rem; color: #000; font-weight: bold;
-            white-space: nowrap;
         }
         button:hover { background: rgba(0,0,0,0.05); }
-        button:disabled { opacity: 0.3; cursor: not-allowed; border-color: #666; color: #666; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
         
         .bottom-bar { display: flex; align-items: center; justify-content: flex-end; width: 100%; padding-right: 20px; box-sizing: border-box; }
         .attempts-section { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
@@ -69,7 +74,7 @@
         .circle.spent { opacity: 0; }
 
         .solved-row { 
-            width: 100%; height: 80px; border-radius: 25px; display: flex; 
+            width: 100%; height: 85px; border-radius: 25px; display: flex; 
             flex-direction: column; align-items: center; justify-content: center; 
             margin-bottom: 8px; font-weight: 800; text-transform: uppercase; 
             border: var(--border-width) solid var(--grid-line); 
@@ -103,21 +108,52 @@
     </div>
 
     <script>
-        // Dictionary for phonetics and definitions
+        // EXPANDED DICTIONARY
         const dictionary = {
             "APPLE": { phon: "/ˈæp.əl/", def: "A round fruit with red or green skin." },
             "DATE": { phon: "/deɪt/", def: "A sweet brown fruit or a specific day." },
             "LIME": { phon: "/laɪm/", def: "A small, green, sour citrus fruit." },
             "KIWI": { phon: "/ˈkiː.wiː/", def: "A small fruit with thin hairy skin." },
+            "MONTH": { phon: "/mʌnθ/", def: "One of the twelve periods of a year." },
+            "YEAR": { phon: "/jɪər/", def: "The time it takes Earth to orbit the sun." },
+            "WEEK": { phon: "/wiːk/", def: "A period of seven days." },
+            "ORANGE": { phon: "/ˈɒr.ɪndʒ/", def: "A bright reddish-yellow citrus fruit." },
+            "ROSE": { phon: "/roʊz/", def: "A sweet-smelling flower with thorny stems." },
+            "SILVER": { phon: "/ˈsɪl.vər/", def: "A shiny grey-white precious metal." },
+            "GOLD": { phon: "/ɡoʊld/", def: "A precious yellow metal." },
+            "IRON": { phon: "/ˈaɪ.ən/", def: "A strong, hard magnetic silver-grey metal." },
+            "TIN": { phon: "/tɪn/", def: "A silvery-white metal often used for cans." },
             "BARK": { phon: "/bɑːrk/", def: "Outer covering of a tree or a dog's cry." },
             "WOOF": { phon: "/wʊf/", def: "The sound a dog makes." },
+            "YELP": { phon: "/jelp/", def: "A short, sharp cry or bark." },
+            "HOWL": { phon: "/haʊl/", def: "A long, loud, doleful cry by a wolf or dog." },
             "LEAF": { phon: "/liːf/", def: "Green part of a plant attached to a stem." },
             "ROOT": { phon: "/ruːt/", def: "Part of a plant that attaches to the ground." },
+            "BRANCH": { phon: "/brɑːntʃ/", def: "A part of a tree growing out from the trunk." },
+            "SALES": { phon: "/seɪlz/", def: "The exchange of a commodity for money." },
+            "LEGAL": { phon: "/ˈliː.ɡəl/", def: "Related to or permitted by law." },
+            "ADMIN": { phon: "/ˈæd.mɪn/", def: "The management of business operations." },
+            "SECTOR": { phon: "/ˈsek.tər/", def: "A distinct part or branch of an economy." },
+            "SOW": { phon: "/soʊ/", def: "To plant seed by scattering." },
+            "SEED": { phon: "/siːd/", def: "A flowering plant's unit of reproduction." },
+            "BLOOM": { phon: "/bluːm/", def: "A flower, especially one cultivated for beauty." },
+            "GARDEN": { phon: "/ˈɡɑːr.dən/", def: "A piece of ground used for growing plants." },
             "PEN": { phon: "/pen/", def: "An instrument for writing with ink." },
+            "PENCIL": { phon: "/ˈpen.səl/", def: "A thin rod of graphite used for writing." },
+            "MARKER": { phon: "/ˈmɑːr.kər/", def: "A felt-tip pen with a broad tip." },
+            "CRAYON": { phon: "/ˈkreɪ.ɒn/", def: "A pencil or stick of colored wax." },
+            "STAPLE": { phon: "/ˈsteɪ.pəl/", def: "A small wire fastner." },
+            "CLIP": { phon: "/klɪp/", def: "A flexible device for holding things together." },
+            "FOLDER": { phon: "/ˈfoʊl.dər/", def: "A folding cover for loose papers." },
+            "BINDER": { phon: "/ˈbaɪn.dər/", def: "A cover for holding sheets of paper together." },
+            "SHIFT": { phon: "/ʃɪft/", def: "To move or change position." },
+            "ENTER": { phon: "/ˈen.tər/", def: "To come or go into a place." },
+            "CONTROL": { phon: "/kənˈtroʊl/", def: "The power to influence behavior." },
+            "ESCAPE": { phon: "/ɪˈskeɪp/", def: "To break free from confinement." },
             "FOLD": { phon: "/foʊld/", def: "To bend something over on itself." },
-            "GOLD": { phon: "/ɡoʊld/", def: "A precious yellow metal." },
-            "IRON": { phon: "/ˈaɪ.ən/", def: "A strong, hard magnetic silver-grey metal." }
-            // ADD MORE WORDS HERE
+            "CREASE": { phon: "/kriːs/", def: "A line or ridge produced by folding." },
+            "BEND": { phon: "/bend/", def: "To shape into a curve or angle." },
+            "PLEAT": { phon: "/pliːt/", def: "A double or multiple fold in cloth." }
         };
 
         let gameData = [], currentWords = [], selectedWords = [], mistakes = 4, masterBank = null;
@@ -130,7 +166,7 @@
                 loadNewPuzzle();
             } catch (e) { 
                 console.error("Data Load Error:", e);
-                alert("Could not load master_category_bank.json. Please ensure you ran the Python script and are using a local server.");
+                alert("Could not load master_category_bank.json.");
             }
         }
 
@@ -161,7 +197,7 @@
                 div.className = 'word-card';
                 if (selectedWords.find(sw => sw.text === wordObj.text)) div.classList.add('selected');
                 
-                const info = dictionary[wordObj.text] || { phon: "", def: "Definition missing." };
+                const info = dictionary[wordObj.text] || { phon: "[Phonetic Unavailable]", def: "Definition needs to be added to index.html." };
                 div.innerHTML = `
                     <div class="word-text">${wordObj.text}</div>
                     <div class="def-container" id="def-${wordObj.text}">
