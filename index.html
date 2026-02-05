@@ -9,8 +9,8 @@
             --bg: #FFFAF0; 
             --card-base: #B09B8C; 
             --card-selected: #FFE4C4; 
-            /* Updated to Light Brown #C4A484 */
-            --button-bg: #C4A484;
+            /* Lighter brown for buttons */
+            --button-bg: #D2B48C; 
             --grid-line: #000;
         }
         body { 
@@ -31,12 +31,13 @@
             letter-spacing: 6px;
         }
 
+        /* Wider, uniform grid lines and border */
         .grid { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 5px; 
-            padding: 5px; 
+            gap: 8px; /* Increased width */
+            padding: 8px; 
             background-color: var(--grid-line); 
-            border: 5px solid var(--grid-line); 
+            border: 8px solid var(--grid-line); /* Matches gap exactly */
             border-radius: 35px;
             margin-bottom: 20px;
             box-sizing: border-box;
@@ -54,7 +55,8 @@
             transition: background 0.15s ease;
         }
         
-        .word-text { font-size: 1.1rem; color: #000; }
+        /* Increased font size for the words */
+        .word-text { font-size: 1.3rem; color: #000; letter-spacing: 0.5px; }
         
         .def-container { 
             font-size: 0.65rem; text-transform: none; font-weight: 500; 
@@ -64,18 +66,17 @@
 
         .word-card.selected { background: var(--card-selected); }
 
-        /* Buttons narrowed with horizontal padding on the container */
         .controls { 
             display: flex; gap: 10px; justify-content: center; 
             margin-bottom: 10px; width: 100%;
-            padding: 0 40px; /* Adds space on each side before grid ends */
+            padding: 0 50px; /* Slightly more space on sides */
             box-sizing: border-box;
         }
         
         button { 
             flex: 1; padding: 10px 0; border-radius: 50px; border: 2px solid #000; 
             background: var(--button-bg); 
-            font-weight: normal; /* No longer bold */
+            font-weight: normal;
             cursor: pointer; font-size: 0.95rem;
         }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
