@@ -6,14 +6,11 @@
     <title>CATEGORIES</title>
     <style>
         :root {
-            /* Page: Floral White */
             --bg: #FFFAF0; 
-            /* Card Base: Ivory Brown */
             --card-base: #B09B8C; 
-            /* Card Selected: Bisque */
             --card-selected: #FFE4C4; 
-            /* Buttons & Circles: Dutch White (Lighter) */
-            --accent: #EFDFBB;
+            /* Updated to Light Brown #C4A484 */
+            --button-bg: #C4A484;
             --grid-line: #000;
         }
         body { 
@@ -67,29 +64,32 @@
 
         .word-card.selected { background: var(--card-selected); }
 
+        /* Buttons narrowed with horizontal padding on the container */
         .controls { 
-            display: flex; gap: 10px; justify-content: space-between; 
+            display: flex; gap: 10px; justify-content: center; 
             margin-bottom: 10px; width: 100%;
+            padding: 0 40px; /* Adds space on each side before grid ends */
+            box-sizing: border-box;
         }
         
         button { 
-            flex: 1; padding: 12px 0; border-radius: 50px; border: 2px solid #000; 
-            background: var(--accent); 
-            font-weight: bold; cursor: pointer; font-size: 0.95rem;
+            flex: 1; padding: 10px 0; border-radius: 50px; border: 2px solid #000; 
+            background: var(--button-bg); 
+            font-weight: normal; /* No longer bold */
+            cursor: pointer; font-size: 0.95rem;
         }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
         
-        /* Attempts aligned to the right side under the Submit button */
         .attempts-section { 
             display: flex; align-items: center; justify-content: flex-end; gap: 10px;
             font-weight: 400; font-size: 1.1rem; 
             width: 100%;
-            padding-right: 5px; /* Aligns with the right grid border edge */
+            padding-right: 5px; 
         }
         .circles-container { display: flex; gap: 8px; }
         .circle { 
             width: 16px; height: 16px; 
-            background: var(--accent); 
+            background: var(--button-bg); 
             border-radius: 50%; transition: opacity 0.3s;
         }
         .circle.spent { opacity: 0; }
@@ -130,6 +130,7 @@
     </div>
 
     <script>
+        // Dictionary and Game Logic remain the same as previous functional version
         const dictionary = {
             "BARK": { phon: "bɑːrk", def: "The protective outer covering of a tree trunk." },
             "LEAF": { phon: "liːf", def: "A flattened structure of a higher plant, typically green." },
