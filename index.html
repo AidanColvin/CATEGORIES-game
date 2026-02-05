@@ -12,7 +12,7 @@
             --card-base: #B09B8C; 
             /* Card Selected: Bisque */
             --card-selected: #FFE4C4; 
-            /* Buttons & Circles: Dutch White */
+            /* Buttons & Circles: Dutch White (Lighter) */
             --accent: #EFDFBB;
             --grid-line: #000;
         }
@@ -34,13 +34,12 @@
             letter-spacing: 6px;
         }
 
-        /* Thinner, uniform black grid */
         .grid { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 5px; /* Half of previous weight */
+            gap: 5px; 
             padding: 5px; 
             background-color: var(--grid-line); 
-            border: 5px solid var(--grid-line); /* Same as grid lines */
+            border: 5px solid var(--grid-line); 
             border-radius: 35px;
             margin-bottom: 20px;
             box-sizing: border-box;
@@ -68,7 +67,6 @@
 
         .word-card.selected { background: var(--card-selected); }
 
-        /* Buttons matching grid width */
         .controls { 
             display: flex; gap: 10px; justify-content: space-between; 
             margin-bottom: 10px; width: 100%;
@@ -76,22 +74,22 @@
         
         button { 
             flex: 1; padding: 12px 0; border-radius: 50px; border: 2px solid #000; 
-            background: var(--accent); /* Dutch White inside */
+            background: var(--accent); 
             font-weight: bold; cursor: pointer; font-size: 0.95rem;
         }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
         
-        /* Attempts aligned under the Shuffle button (left) */
+        /* Attempts aligned to the right side under the Submit button */
         .attempts-section { 
-            display: flex; align-items: center; gap: 10px;
+            display: flex; align-items: center; justify-content: flex-end; gap: 10px;
             font-weight: 400; font-size: 1.1rem; 
             width: 100%;
-            padding-left: 5px; /* Keeps it inside the border line alignment */
+            padding-right: 5px; /* Aligns with the right grid border edge */
         }
         .circles-container { display: flex; gap: 8px; }
         .circle { 
             width: 16px; height: 16px; 
-            background: var(--accent); /* Dutch White circles */
+            background: var(--accent); 
             border-radius: 50%; transition: opacity 0.3s;
         }
         .circle.spent { opacity: 0; }
