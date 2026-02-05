@@ -6,100 +6,95 @@
     <title>CATEGORIES</title>
     <style>
         :root {
-            --yellow: #f9df6d; --green: #a0c35a;
-            --blue: #b0c4ef; --purple: #ba81c5;
-            /* Page Background: Floral White */
             --bg: #FFFAF0; 
-            /* Card Base: Ivory Brown */
             --card-base: #B09B8C; 
-            /* Card Selected: Bisque */
             --card-selected: #FFE4C4; 
-            /* Buttons & Circles: Dutch White */
             --accent: #EFDFBB;
             --grid-line: #000;
         }
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif; 
             display: flex; flex-direction: column; align-items: center; 
-            background: var(--bg); padding: 40px 20px; 
+            background: var(--bg); margin: 0; padding: 10px;
+            height: 100vh; justify-content: center; overflow: hidden;
         }
         
-        #game-container { max-width: 850px; width: 100%; }
+        #game-container { width: 100%; max-width: 620px; text-align: center; }
         
-        /* All Caps, Large, Not Bold Title */
         h1 { 
-            margin-bottom: 40px; 
-            font-size: 3.5rem; 
+            margin: 0 0 15px 0; 
+            font-size: 2.8rem; 
             font-weight: 300; 
             text-transform: uppercase; 
-            letter-spacing: 4px;
+            letter-spacing: 6px;
         }
 
-        /* Thinner black grid (half the previous weight) */
+        /* Uniform wider grid lines */
         .grid { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 6px; 
-            padding: 6px; 
+            gap: 10px; 
+            padding: 10px; 
             background-color: var(--grid-line); 
-            border: 6px solid var(--grid-line); 
-            border-radius: 24px; /* More curved grid */
-            margin-bottom: 40px;
+            border: 10px solid var(--grid-line); 
+            border-radius: 35px; /* Maximum curvature */
+            margin-bottom: 20px;
+            box-sizing: border-box;
         }
 
         .word-card { 
             aspect-ratio: 1/1; 
             background: var(--card-base); 
-            border-radius: 20px; /* More curved box corners */
+            border-radius: 25px; /* Highly curved boxes */
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             font-weight: 800; text-transform: uppercase; 
             cursor: pointer; user-select: none; text-align: center; 
-            padding: 20px;
-            transition: background 0.2s ease;
+            padding: 10px;
+            transition: background 0.15s ease;
         }
         
-        .word-text { font-size: 1.5rem; color: #000; }
+        .word-text { font-size: 1.1rem; color: #000; line-height: 1.1; }
         
         .def-container { 
-            font-size: 0.85rem; text-transform: none; font-weight: 500; 
-            margin-top: 10px; color: #222; line-height: 1.3;
+            font-size: 0.65rem; text-transform: none; font-weight: 500; 
+            margin-top: 5px; color: #222; line-height: 1.1;
             display: none; 
         }
 
         .word-card.selected { background: var(--card-selected); }
 
         .solved-row { 
-            grid-column: span 4; height: 100px; border-radius: 20px;
+            grid-column: span 4; height: 85px; border-radius: 25px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-bottom: 12px; font-weight: 800; text-transform: uppercase;
-            font-size: 1.4rem;
+            margin-bottom: 10px; font-weight: 800; text-transform: uppercase;
+            font-size: 1.1rem;
         }
 
-        /* Controls Area */
-        .controls { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; }
+        /* Buttons matching grid width */
+        .controls { 
+            display: flex; gap: 8px; justify-content: space-between; 
+            margin-bottom: 15px; width: 100%; padding: 0 2px;
+            box-sizing: border-box;
+        }
         
         button { 
-            padding: 18px 35px; border-radius: 50px; border: 2px solid #000; 
-            background: var(--accent); /* Dutch White inside */
-            font-weight: bold; cursor: pointer; font-size: 1.1rem;
+            flex: 1; padding: 12px 0; border-radius: 50px; border: 2px solid #000; 
+            background: var(--accent); font-weight: bold; cursor: pointer; font-size: 0.95rem;
         }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
         
-        /* Attempts Area - Below Buttons, Not Bold */
         .attempts-section { 
-            display: flex; align-items: center; justify-content: center; gap: 15px;
-            font-weight: 400; font-size: 1.3rem; 
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            font-weight: 400; font-size: 1.1rem; 
         }
-        .circles-container { display: flex; gap: 10px; }
+        .circles-container { display: flex; gap: 8px; }
         .circle { 
-            width: 18px; height: 18px; 
-            background: var(--accent); /* Dutch White circles */
-            border-radius: 50%; 
-            transition: opacity 0.3s;
+            width: 16px; height: 16px; background: var(--accent); 
+            border-radius: 50%; transition: opacity 0.3s;
         }
-        .circle.spent { opacity: 0; } /* Disappears when spent */
+        .circle.spent { opacity: 0; }
 
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
         .shake { animation: shake 0.2s ease-in-out 0s 2; }
     </style>
 </head>
@@ -129,6 +124,7 @@
     </div>
 
     <script>
+        // Dictionary stays the same, ensure phonetic values don't have slashes
         const dictionary = {
             "BARK": { phon: "bɑːrk", def: "The protective outer covering of a tree trunk." },
             "LEAF": { phon: "liːf", def: "A flattened structure of a higher plant, typically green." },
@@ -232,7 +228,7 @@
             const row = document.createElement('div');
             row.className = 'solved-row';
             row.style.backgroundColor = `var(--${category.color.toLowerCase()})`;
-            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal; font-size: 1.1rem">${category.words.join(', ')}</div>`;
+            row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal; font-size: 0.9rem">${category.words.join(', ')}</div>`;
             
             document.getElementById('solved-container').appendChild(row);
             selectedWords = [];
@@ -243,15 +239,12 @@
         function handleWrong() {
             mistakes--;
             const circles = document.querySelectorAll('.circle');
-            // Remove circle from right to left
             if (circles[mistakes]) {
                 circles[mistakes].classList.add('spent');
             }
-
             const grid = document.getElementById('grid');
             grid.classList.add('shake');
             setTimeout(() => grid.classList.remove('shake'), 500);
-            
             if (mistakes === 0) {
                 setTimeout(() => { alert("Game Over!"); location.reload(); }, 600);
             }
