@@ -6,9 +6,13 @@
     <title>CATEGORIES</title>
     <style>
         :root {
+            /* Page: Floral White */
             --bg: #FFFAF0; 
+            /* Card Base: Ivory Brown */
             --card-base: #B09B8C; 
+            /* Card Selected: Bisque */
             --card-selected: #FFE4C4; 
+            /* Buttons & Circles: Dutch White */
             --accent: #EFDFBB;
             --grid-line: #000;
         }
@@ -19,9 +23,10 @@
             height: 100vh; justify-content: center; overflow: hidden;
         }
         
-        #game-container { width: 100%; max-width: 620px; text-align: center; }
+        #game-container { width: 100%; max-width: 620px; }
         
         h1 { 
+            text-align: center;
             margin: 0 0 15px 0; 
             font-size: 2.8rem; 
             font-weight: 300; 
@@ -29,14 +34,14 @@
             letter-spacing: 6px;
         }
 
-        /* Uniform wider grid lines */
+        /* Thinner, uniform black grid */
         .grid { 
             display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 10px; 
-            padding: 10px; 
+            gap: 5px; /* Half of previous weight */
+            padding: 5px; 
             background-color: var(--grid-line); 
-            border: 10px solid var(--grid-line); 
-            border-radius: 35px; /* Maximum curvature */
+            border: 5px solid var(--grid-line); /* Same as grid lines */
+            border-radius: 35px;
             margin-bottom: 20px;
             box-sizing: border-box;
         }
@@ -44,7 +49,7 @@
         .word-card { 
             aspect-ratio: 1/1; 
             background: var(--card-base); 
-            border-radius: 25px; /* Highly curved boxes */
+            border-radius: 25px;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             font-weight: 800; text-transform: uppercase; 
@@ -53,7 +58,7 @@
             transition: background 0.15s ease;
         }
         
-        .word-text { font-size: 1.1rem; color: #000; line-height: 1.1; }
+        .word-text { font-size: 1.1rem; color: #000; }
         
         .def-container { 
             font-size: 0.65rem; text-transform: none; font-weight: 500; 
@@ -63,36 +68,39 @@
 
         .word-card.selected { background: var(--card-selected); }
 
-        .solved-row { 
-            grid-column: span 4; height: 85px; border-radius: 25px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-bottom: 10px; font-weight: 800; text-transform: uppercase;
-            font-size: 1.1rem;
-        }
-
         /* Buttons matching grid width */
         .controls { 
-            display: flex; gap: 8px; justify-content: space-between; 
-            margin-bottom: 15px; width: 100%; padding: 0 2px;
-            box-sizing: border-box;
+            display: flex; gap: 10px; justify-content: space-between; 
+            margin-bottom: 10px; width: 100%;
         }
         
         button { 
             flex: 1; padding: 12px 0; border-radius: 50px; border: 2px solid #000; 
-            background: var(--accent); font-weight: bold; cursor: pointer; font-size: 0.95rem;
+            background: var(--accent); /* Dutch White inside */
+            font-weight: bold; cursor: pointer; font-size: 0.95rem;
         }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
         
+        /* Attempts aligned under the Shuffle button (left) */
         .attempts-section { 
-            display: flex; align-items: center; justify-content: center; gap: 12px;
+            display: flex; align-items: center; gap: 10px;
             font-weight: 400; font-size: 1.1rem; 
+            width: 100%;
+            padding-left: 5px; /* Keeps it inside the border line alignment */
         }
         .circles-container { display: flex; gap: 8px; }
         .circle { 
-            width: 16px; height: 16px; background: var(--accent); 
+            width: 16px; height: 16px; 
+            background: var(--accent); /* Dutch White circles */
             border-radius: 50%; transition: opacity 0.3s;
         }
         .circle.spent { opacity: 0; }
+
+        .solved-row { 
+            grid-column: span 4; height: 85px; border-radius: 25px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin-bottom: 10px; font-weight: 800; text-transform: uppercase;
+        }
 
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
         .shake { animation: shake 0.2s ease-in-out 0s 2; }
@@ -124,7 +132,6 @@
     </div>
 
     <script>
-        // Dictionary stays the same, ensure phonetic values don't have slashes
         const dictionary = {
             "BARK": { phon: "bɑːrk", def: "The protective outer covering of a tree trunk." },
             "LEAF": { phon: "liːf", def: "A flattened structure of a higher plant, typically green." },
@@ -148,7 +155,6 @@
         let currentWords = [];
         let selectedWords = [];
         let mistakes = 4;
-        let solvedCategories = [];
 
         async function initGame() {
             try {
@@ -222,14 +228,11 @@
 
         function handleCorrect(catId) {
             const category = gameData.find(c => c.id === catId);
-            solvedCategories.push(catId);
             currentWords = currentWords.filter(w => w.catId !== catId);
-            
             const row = document.createElement('div');
             row.className = 'solved-row';
             row.style.backgroundColor = `var(--${category.color.toLowerCase()})`;
             row.innerHTML = `<div>${category.name}</div><div style="font-weight:normal; font-size: 0.9rem">${category.words.join(', ')}</div>`;
-            
             document.getElementById('solved-container').appendChild(row);
             selectedWords = [];
             document.getElementById('submit-btn').disabled = true;
@@ -239,9 +242,7 @@
         function handleWrong() {
             mistakes--;
             const circles = document.querySelectorAll('.circle');
-            if (circles[mistakes]) {
-                circles[mistakes].classList.add('spent');
-            }
+            if (circles[mistakes]) circles[mistakes].classList.add('spent');
             const grid = document.getElementById('grid');
             grid.classList.add('shake');
             setTimeout(() => grid.classList.remove('shake'), 500);
